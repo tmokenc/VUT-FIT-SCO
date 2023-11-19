@@ -20,8 +20,10 @@ pub use poly1305::Tag;
 
 pub use chacha20poly1305::ChaCha20Poly1305;
 
+#[cfg(feature = "alloc")]
 use alloc::vec::Vec;
 
+#[cfg(feature = "alloc")]
 pub(crate) fn try_to_vec(data: &[u8]) -> Result<Vec<u8>> {
     let mut res = Vec::new();
 

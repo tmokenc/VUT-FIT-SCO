@@ -18,7 +18,7 @@ pub struct ChaCha20Poly1305 {
 
 impl ChaCha20Poly1305 {
     /// Creates a new ChaCha20Poly1305 instance with the provided key, nonce, and additional authenticated data (AAD).
-    pub fn new(key: &Key, nonce: &Nonce, aad: &[u8]) -> Self {
+    pub fn new(key: &Key, nonce: &Nonce, aad: &[u8]) -> Result<Self> {
         let mut chacha20 = ChaCha20::new_with_cnt(key, nonce, 1);
         let mut poly1305_key = gen_poly1305_key(&mut chacha20);
         let mut poly1305 = Poly1305::new(&poly1305_key);
@@ -28,12 +28,12 @@ impl ChaCha20Poly1305 {
         poly1305.update(&aad);
         poly1305.update_leftover_pad16();
 
-        Self {
+        Ok(Self {
             chacha20,
             poly1305,
             data_len: 0,
-            aad_len: u64::try_from(aad.len()).unwrap(),
-        }
+            aad_len: u64::try_from(aad.len()).map_err(|_| error::Error::AadTooLong)?,
+        })
     }
 
     #[inline]
@@ -86,6 +86,19 @@ impl ChaCha20Poly1305 {
         self.poly1305.finalize()
     }
 
+    #[inline]
+    /// Verify the `Tag` with the processed
+    pub fn verify(mut self, tag: &Tag) -> Result<()> {
+        self.data_len = u64::try_from(self.data_len).unwrap();
+        self.poly1305.update_leftover_pad16();
+        self.auth_len();
+
+        if !self.poly1305.verify(tag) {
+            Err(error::Error::Unauthenticated)
+        } else {
+            Ok(())
+        }
+    }
     /// Encrypts the provided data in-place in a one-shot operation and returns the authentication tag.
     pub fn encrypt_oneshot_in_place(mut self, data: &mut [u8]) -> Result<Tag> {
         for chunk in data.chunks_mut(DATA_CHUNK_SIZE) {
@@ -184,7 +197,7 @@ mod test {
             0x06, 0x91,
         ];
 
-        let cipher = ChaCha20Poly1305::new(&key, &nonce, aad);
+        let cipher = ChaCha20Poly1305::new(&key, &nonce, aad)?;
         let mut res = text.clone();
 
         let tag = cipher.encrypt_oneshot_in_place(&mut res)?;
@@ -193,7 +206,7 @@ mod test {
         assert_eq!(&tag, &expected_tag);
 
         // Decipher side
-        let cipher = ChaCha20Poly1305::new(&key, &nonce, aad);
+        let cipher = ChaCha20Poly1305::new(&key, &nonce, aad)?;
         cipher.decrypt_oneshot_in_place(&mut res, &tag)?;
 
         assert_eq!(&res, text);
@@ -320,7 +333,7 @@ mod test {
             0x70, 0x72, 0x6f, 0x67, 0x72, 0x65, 0x73, 0x73, 0x2e, 0x2f, 0xe2, 0x80, 0x9d,
         ];
 
-        let cipher = ChaCha20Poly1305::new(&key, &nonce, &aad);
+        let cipher = ChaCha20Poly1305::new(&key, &nonce, &aad)?;
         cipher.decrypt_oneshot_in_place(&mut ciphertext, &tag)?;
 
         assert_eq!(ciphertext, expected);
