@@ -1,6 +1,6 @@
-# Cryptorust Library
+# Chacha20Poly1305
 
-Cryptorust is a collection of cryptographic primitives implemented in Rust.
+This is my school project for the course Secure Coding
 
 ## Modules
 
@@ -32,15 +32,15 @@ To use this library, add the following to your `Cargo.toml` file:
 
 ```toml
 [dependencies]
-cryptorust = "0.1.0"
+chacha20poly1305 = { git = "https://github.com/tmokenc/VUT-FIT-SCO" }
 ```
 
-Then, in your Rust code, import the necessary types and modules:
+## Test
 
-```rust
-extern crate cryptorust;
+To comfirm the correctness of the library
 
-use cryptorust::{Chacha20, Key as Chacha20Key, Nonce, Poly1305, Poly1305Key, Tag, Chacha20Poly1305};
+```sh
+cargo test --package chacha20poly1305
 ```
 
 ## Examples
@@ -48,16 +48,18 @@ use cryptorust::{Chacha20, Key as Chacha20Key, Nonce, Poly1305, Poly1305Key, Tag
 Below is a simple example demonstrating the usage of the Chacha20 module:
 
 ```rust
-// Example demonstrating the usage of the Chacha20 module
+use rand::prelude::*;
+use chacha20poly1305::{Chacha20, Key, Nonce};
+
 fn main() {
-    let key: Chacha20Key = [0; cryptorust::chacha20::KEY_SIZE / 8];
-    let nonce: Nonce = [1; cryptorust::chacha20::NONCE_SIZE / 8];
+    let mut rng = thread_rng();
+    let key: Key = rng.gen();
+    let nonce: Nonce = rng.gen();
 
     let mut chacha = Chacha20::new(&key, &nonce);
     let data = b"example data";
 
-    let result = chacha.perform(data);
-    match result {
+    match  chacha.perform(data) {
         Ok(encrypted) => println!("Encrypted data: {:?}", encrypted),
         Err(err) => eprintln!("Error: {:?}", err),
     }
