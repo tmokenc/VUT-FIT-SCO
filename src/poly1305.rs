@@ -2,6 +2,7 @@
 
 mod cross_arch;
 
+use core::hint::black_box;
 use cross_arch::Poly1305Inner;
 use zeroize::Zeroize;
 
@@ -109,18 +110,20 @@ impl Poly1305 {
         for (a, b) in self.finalize().into_iter().zip(tag) {
             // perform constant time comparation
 
-            // x will be 0 when a is equal b
-            let x = a ^ b;
+            black_box({
+                // x will be 0 when a is equal b
+                let x = a ^ b;
 
-            // if they are equal, then x and -x will be the same as 0 and -0
-            // otherwise x | -x with output a number with the msb set to 1
-            // then just need to shift that bit back into the first position
-            let y = (x | x.wrapping_neg()) >> 7;
+                // if they are equal, then x and -x will be the same as 0 and -0
+                // otherwise x | -x with output a number with the msb set to 1
+                // then just need to shift that bit back into the first position
+                let y = (x | x.wrapping_neg()) >> 7;
 
-            // now if the lsb is 1, the two number is not equal and vice versa.
-            // to get the result, just need to flip it back
-            // and do operation AND to the current state
-            res &= y ^ 1;
+                // now if the lsb is 1, the two number is not equal and vice versa.
+                // to get the result, just need to flip it back
+                // and do operation AND to the current state
+                res &= y ^ 1;
+            })
         }
 
         res == 1

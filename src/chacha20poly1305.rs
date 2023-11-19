@@ -3,7 +3,6 @@
 #[cfg(feature = "alloc")]
 use alloc::vec::Vec;
 
-use crate::chacha20::ChaCha20LimitReached as Error;
 use crate::*;
 use zeroize::Zeroize as _;
 
@@ -39,7 +38,7 @@ impl ChaCha20Poly1305 {
 
     #[inline]
     /// Encrypts the provided data in-place.
-    pub fn encrypt_in_place(&mut self, data: &mut [u8]) -> Result<(), Error> {
+    pub fn encrypt_in_place(&mut self, data: &mut [u8]) -> Result<()> {
         self.chacha20.perform_in_place(data)?;
         self.poly1305.update(data);
         self.data_len += u64::try_from(data.len()).unwrap();
@@ -49,15 +48,15 @@ impl ChaCha20Poly1305 {
     #[cfg(feature = "alloc")]
     #[inline(always)]
     /// Encrypts the provided data and returns the result as a new vector.
-    pub fn encrypt(&mut self, data: &[u8]) -> Result<Vec<u8>, Error> {
-        let mut data = data.to_vec();
+    pub fn encrypt(&mut self, data: &[u8]) -> Result<Vec<u8>> {
+        let mut data = try_to_vec(data)?;
         self.encrypt_in_place(&mut data)?;
         Ok(data)
     }
 
     #[inline]
     /// Decrypts the provided data in-place.
-    pub fn decrypt_in_place(&mut self, data: &mut [u8]) -> Result<(), Error> {
+    pub fn decrypt_in_place(&mut self, data: &mut [u8]) -> Result<()> {
         self.poly1305.update(data);
         self.chacha20.perform_in_place(data)?;
         self.data_len += u64::try_from(data.len()).unwrap();
@@ -67,8 +66,8 @@ impl ChaCha20Poly1305 {
     #[cfg(feature = "alloc")]
     #[inline(always)]
     /// Decrypts the provided data and returns the result as a new vector.
-    pub fn decrypt(&mut self, data: &[u8]) -> Result<Vec<u8>, Error> {
-        let mut data = data.to_vec();
+    pub fn decrypt(&mut self, data: &[u8]) -> Result<Vec<u8>> {
+        let mut data = try_to_vec(data)?;
         self.decrypt_in_place(&mut data)?;
         Ok(data)
     }
@@ -88,7 +87,7 @@ impl ChaCha20Poly1305 {
     }
 
     /// Encrypts the provided data in-place in a one-shot operation and returns the authentication tag.
-    pub fn encrypt_oneshot_in_place(mut self, data: &mut [u8]) -> Result<Tag, Error> {
+    pub fn encrypt_oneshot_in_place(mut self, data: &mut [u8]) -> Result<Tag> {
         for chunk in data.chunks_mut(DATA_CHUNK_SIZE) {
             self.chacha20.perform_in_place(chunk)?;
             self.poly1305.update(chunk);
@@ -101,14 +100,14 @@ impl ChaCha20Poly1305 {
 
     #[cfg(feature = "alloc")]
     /// Encrypts the provided data in a one-shot operation and returns the result as a new vector along with the authentication tag.
-    pub fn encrypt_oneshot(self, data: &[u8]) -> Result<(Vec<u8>, Tag), Error> {
-        let mut data = data.to_vec();
+    pub fn encrypt_oneshot(self, data: &[u8]) -> Result<(Vec<u8>, Tag)> {
+        let mut data = try_to_vec(data)?;
         let tag = self.encrypt_oneshot_in_place(&mut data)?;
         Ok((data, tag))
     }
 
     /// Decrypts the provided data in-place in a one-shot operation and verifies the authentication tag.
-    pub fn decrypt_oneshot_in_place(mut self, data: &mut [u8], tag: &Tag) -> Result<(), Error> {
+    pub fn decrypt_oneshot_in_place(mut self, data: &mut [u8], tag: &Tag) -> Result<()> {
         for chunk in data.chunks_mut(DATA_CHUNK_SIZE) {
             self.poly1305.update(chunk);
             self.chacha20.perform_in_place(chunk)?;
@@ -119,7 +118,7 @@ impl ChaCha20Poly1305 {
         self.auth_len();
 
         if !self.poly1305.verify(tag) {
-            return Err(Error);
+            return Err(error::Error::Unauthenticated);
         }
 
         Ok(())
@@ -127,8 +126,8 @@ impl ChaCha20Poly1305 {
 
     #[cfg(feature = "alloc")]
     /// Decrypts the provided data in a one-shot operation, verifying the authentication tag, and returns the result as a new vector.
-    pub fn decrypt_oneshot(self, data: &[u8], tag: &Tag) -> Result<Vec<u8>, Error> {
-        let mut data = data.to_vec();
+    pub fn decrypt_oneshot(self, data: &[u8], tag: &Tag) -> Result<Vec<u8>> {
+        let mut data = try_to_vec(data)?;
         self.decrypt_oneshot_in_place(&mut data, tag)?;
         Ok(data)
     }
@@ -149,11 +148,10 @@ pub(crate) fn gen_poly1305_key(cipher: &mut ChaCha20) -> Poly1305Key {
 #[cfg(test)]
 mod test {
     use super::gen_poly1305_key;
-    use crate::chacha20::ChaCha20LimitReached as Error;
     use crate::*;
 
     #[test]
-    fn rfc_8439_example_vector() -> Result<(), crate::chacha20::ChaCha20LimitReached> {
+    fn rfc_8439_example_vector() -> Result<()> {
         let text = b"Ladies and Gentlemen of the class of '99: If I could offer you only one tip for the future, sunscreen would be it.";
         let aad = &[
             0x50, 0x51, 0x52, 0x53, 0xc0, 0xc1, 0xc2, 0xc3, 0xc4, 0xc5, 0xc6, 0xc7,
@@ -258,7 +256,7 @@ mod test {
     }
 
     #[test]
-    fn rfc_8439_aead_decryption() -> Result<(), Error> {
+    fn rfc_8439_aead_decryption() -> Result<()> {
         let key = [
             0x1c, 0x92, 0x40, 0xa5, 0xeb, 0x55, 0xd3, 0x8a, 0xf3, 0x33, 0x88, 0x86, 0x04, 0xf6,
             0xb5, 0xf0, 0x47, 0x39, 0x17, 0xc1, 0x40, 0x2b, 0x80, 0x09, 0x9d, 0xca, 0x5c, 0xbc,

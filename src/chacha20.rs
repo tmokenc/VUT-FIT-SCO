@@ -1,5 +1,6 @@
 //! Implementation of the ChaCha20 stream cipher.
 
+use crate::error::Error;
 #[cfg(feature = "alloc")]
 use alloc::vec::Vec;
 
@@ -26,9 +27,6 @@ pub(crate) type Block = [u8; BLOCK_SIZE];
 pub type Key = [u8; KEY_SIZE / 8];
 /// Represents the ChaCha20 key. It is an array of bytes with a size of 12, or 96 bits.
 pub type Nonce = [u8; NONCE_SIZE / 8];
-
-#[derive(Debug, Clone, Copy)]
-pub struct ChaCha20LimitReached;
 
 #[derive(Clone)]
 /// Represents the ChaCha20 cipher state.
@@ -70,10 +68,10 @@ impl ChaCha20 {
 
     #[inline]
     /// Performs the ChaCha20 encryption/decryption in-place on the provided data.
-    pub fn perform_in_place(&mut self, data: &mut [u8]) -> Result<(), ChaCha20LimitReached> {
+    pub fn perform_in_place(&mut self, data: &mut [u8]) -> crate::Result<()> {
         let required_block = data.len().saturating_sub(self.available) / BLOCK_SIZE;
         if self.remaining_blocks() < required_block {
-            return Err(ChaCha20LimitReached);
+            return Err(Error::DataTooLong);
         }
 
         let full_len = data.len();
@@ -105,10 +103,10 @@ impl ChaCha20 {
     #[cfg(feature = "alloc")]
     #[inline]
     /// Performs the ChaCha20 encryption/decryption on the provided data and returns the result as a new vector.
-    pub fn perform(&mut self, data: &[u8]) -> Result<Vec<u8>, ChaCha20LimitReached> {
-        let mut data = data.to_vec();
-        self.perform_in_place(&mut data)?;
-        Ok(data)
+    pub fn perform(&mut self, data: &[u8]) -> crate::Result<Vec<u8>> {
+        let mut res = crate::try_to_vec(data)?;
+        self.perform_in_place(&mut res)?;
+        Ok(res)
     }
 
     #[inline(always)]
