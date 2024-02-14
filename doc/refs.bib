@@ -1,0 +1,170 @@
+@online{pdf_ref,
+  title = {},
+  author = {},
+  url = {},
+  urldate = {2023-11-09},
+  year = 2007,
+  month = dec,
+  pagetotal = 15,
+  abstract = {},
+}
+
+@online{nukib,
+  title = {MINIMÁLNÍ POŽADAVKY NA KRYPTOGRAFICKÉ ALGORITMY},
+  publisher = {Czech National Cyber and Information Security Agency},
+  url = {https://www.nukib.cz/download/uredni_deska/Minimalni%20pozadavky%20na%20kryptograficke%20algoritmy.pdf}, urldate = {2023-11-09},
+  year = 2023,
+  month = jul,
+  pages = 6,
+  pagetotal = 12,
+
+}
+
+@online{salsa,
+  title = {The Salsa20 family of stream ciphers},
+  author = {Daniel J. Bernstein},
+  url = {https://cr.yp.to/snuffle/salsafamily-20071225.pdf},
+  year = 2007,
+  month = dec,
+  pagetotal = 15,
+  urldate = {2023-11-01},
+  abstract = {Salsa20 is a family of 256-bit stream ciphers designed in 2005 and submitted to eSTREAM, the ECRYPT Stream Cipher Project. Salsa20 has progressed to the third round of eSTREAM without any changes. The 20-round stream cipher Salsa20/20 is consistently faster than AES and is recommended by the designer for typical cryptographic applications. The reduced-round ciphers Salsa20/12 and Salsa20/8 are among the fastest 256-bit stream ciphers available and are recommended for applications where speed is more important than confidence. The fastest known attacks use ≈ 2153 simple operations against Salsa20/7, ≈ 2249 simple operations against Salsa20/8, and ≈ 2255 simple operations against Salsa20/9, Salsa20/10, etc. In this paper, the Salsa20 designer presents Salsa20 and discusses the decisions made in the Salsa20 design.},
+}
+
+@online{chacha,
+  title = {ChaCha, a variant of Salsa20},
+  author = {Daniel J. Bernstein},
+  url = {https://cr.yp.to/chacha/chacha-20080120.pdf},
+  urldate = {2023-11-09},
+  year = 2008,
+  month = jan,
+  pagetotal = 6,
+  abstract = {ChaCha8 is a 256-bit stream cipher based on the 8-round cipher Salsa20/8. The changes from Salsa20/8 to ChaCha8 are designed to improve diffusion per round, conjecturally increasing resistance to cryptanalysis, while preserving—and often improving—time per round. ChaCha12 and ChaCha20 are analogous modifications of the 12-round and 20-round ciphers Salsa20/12 and Salsa20/20. This paper presents the ChaCha family and explains the differences between Salsa20 and ChaCha.},
+}
+
+@online{poly1305,
+  title = {The Poly1305-AES message-authentication code},
+  author = {Daniel J. Bernstein},
+  url = {https://cr.yp.to/papers.html#poly1305},
+  year = 2005,
+  pagetotal = 18,
+  urldate = {2023-11-09},
+  abstract = {Poly1305-AES is a state-of-the-art message-authentication code suitable for a wide variety of applications. Poly1305-AES computes a 16-byte authenticator of a variable-length message, using a 16-byte AES key, a 16-byte additional key, and a 16-byte nonce. The security of Poly1305-AES is very close to the security of AES; the security gap is at most 14DdL/16e/2106 if messages have at most L bytes, the attacker sees at most 264 authenticated messages, and the attacker attempts D forgeries. Poly1305-AES can be computed at extremely high speed: for example, fewer than 3.1` + 780 Athlon cycles for an `-byte message. This speed is achieved without precomputation; consequently, 1000 keys can be handled simultaneously without cache misses. Special-purpose hardware can compute Poly1305-AES at even higher speed. Poly1305- AES is parallelizable, incremental, and not subject to any intellectual- property claims.},
+}
+
+@online{zeroize,
+  title = {zeroize},
+  author = {Tony Arcieri and rustcrypto},
+  url = {https://crates.io/crates/zeroize},
+  urldate = {2023-11-09},
+}
+
+@online{zero_buffer,
+  title = {How to zero a buffer},
+  author = {Coliin Percival},
+  url = {https://www.daemonology.net/blog/2014-09-04-how-to-zero-a-buffer.html},
+  year = 2014,
+  urldate = {2023-11-09},
+}
+
+@online{aead,
+   author = "Wikipedia",
+   title = {Authenticated encryption},
+   year = 2023,
+   url = {http://en.wikipedia.org/w/index.php?title=Authenticated\%20encryption&oldid=1183629505},
+   urldate = {2023-11-09}
+ }
+
+@online{universal_hashing,
+   author = "Wikipedia",
+   title = "Universal hashing",
+   year = 2023,
+   url = {http://en.wikipedia.org/w/index.php?title=Universal\%20hashing&oldid=1182493673},
+   urldate = {2023-11-09}
+ }
+
+@online{chacha20poly1305,
+   author = "Wikipedia",
+   title = {ChaCha20-Poly1305},
+   year = 2023,
+   url = {http://en.wikipedia.org/w/index.php?title=ChaCha20-Poly1305&oldid=1182313000},
+   urldate = {2023-11-09}
+ }
+
+@online{sidechannelattack,
+   author = "Wikipedia",
+   title = {Side-channel attack},
+   year = 2023,
+   url = {http://en.wikipedia.org/w/index.php?title=Side-channel\%20attack&oldid=1182539399},
+   urldate = {2023-11-09}
+ }
+
+@online{chacha20cryptanalysis,
+  author = {Bernhard Jungk and Shivam Bhasin},
+  title = {Don’t Fall into a Trap: Physical Side-Channel Analysis of ChaCha20-Poly1305},
+  year = 2017,
+  url = {https://past.date-conference.com/proceedings-archive/2017/pdf/7031.pdf},
+  urldate = {2023-11-09},
+}
+
+@online{poly1305_donna,
+  author = {Andrew Moon},
+  title = {poly1305-donna},
+  year = 2016,
+  url = {https://github.com/floodyberry/poly1305-donna},
+  urldate = {2023-11-09},
+}
+
+@online{architectures,
+  author = {Rust Lang Team},
+  title = {Rustc Platform Support},
+  url = {https://doc.rust-lang.org/nightly/rustc/platform-support.html},
+  urldate = {2023-11-09},
+}
+
+@online{simd,
+  author = "Wikipedia",
+  title = {Single instruction, multiple data},
+  year = 2023,
+  url = {https://en.wikipedia.org/wiki/Single_instruction,_multiple_data},
+  urldate = {2023-11-14},
+}
+
+@online{DSA,
+  author = "Wikipedia",
+  title = {Digital Signature Algorithm},
+  year = 2023,
+  url = {https://en.wikipedia.org/wiki/Digital_Signature_Algorithm},
+  urldate = {2023-11-14},
+}
+
+@online{relay_attack,
+  author = "Wikipedia",
+  title = {Relay attack},
+  year = 2023,
+  url = {https://en.wikipedia.org/wiki/Relay_attack},
+  urldate = {2023-11-14},
+}
+
+@online{RNG,
+  author = "Wikipedia",
+  title = {Cryptographically secure pseudorandom number generator},
+  year = 2023,
+  url = {https://en.wikipedia.org/wiki/Cryptographically_secure_pseudorandom_number_generator},
+  urldate = {2023-11-14},
+}
+
+@misc{rfc8439,
+    series =    {Request for Comments},
+    number =    8439,
+    howpublished =  {RFC 8439},
+    publisher = {RFC Editor},
+    doi =       {10.17487/RFC8439},
+    url =       {https://www.rfc-editor.org/info/rfc8439},
+    author =    {Yoav Nir and Adam Langley},
+    title =     {{ChaCha20 and Poly1305 for IETF Protocols}},
+    pagetotal = 46,
+    year =      2018,
+    month =     jun,
+    abstract =  {This document defines the ChaCha20 stream cipher as well as the use of the Poly1305 authenticator, both as stand-alone algorithms and as a "combined mode", or Authenticated Encryption with Associated Data (AEAD) algorithm. RFC 7539, the predecessor of this document, was meant to serve as a stable reference and an implementation guide. It was a product of the Crypto Forum Research Group (CFRG). This document merges the errata filed against RFC 7539 and adds a little text to the Security Considerations section.},
+}
